@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{840E12B2-7894-47A8-A53F-D3BAC51AF520}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>EBE.Data</RootNamespace>
+    <AssemblyName>EBE.Data</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="cp 3rd\ party\ bin/{ebe,*.dll} ../Gen/bin/Debug/" workingdir="${ProjectDir}" externalConsole="True" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Iesi.Collections">
+      <HintPath>3rd party bin\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>3rd party bin\mysql.data.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>3rd party bin\NHibernate.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Encyclopedia.cs" />
+    <Compile Include="Gen.cs" />
+    <Compile Include="EBEContext.cs" />
+    <Compile Include="Repositories\IRepository.cs" />
+    <Compile Include="Repositories\Repository.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="nhibernate-mapping.xsd" />
+    <None Include="hibernate.cfg.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="3rd party bin\Iesi.Collections.dll" />
+    <None Include="3rd party bin\Iesi.Collections.pdb" />
+    <None Include="3rd party bin\Iesi.Collections.xml" />
+    <None Include="3rd party bin\mysql.data.dll" />
+    <None Include="3rd party bin\NHibernate.dll" />
+    <None Include="3rd party bin\NHibernate.pdb" />
+    <None Include="3rd party bin\ebe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mappings\" />
+    <Folder Include="3rd party bin\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Encyclopedia.hbm.xml" />
+  </ItemGroup>
+</Project>

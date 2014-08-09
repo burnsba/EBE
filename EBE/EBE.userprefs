@@ -1,0 +1,29 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Gen/Generator.cs">
+    <Files>
+      <File FileName="Gen/Program.cs" Line="46" Column="28" />
+      <File FileName="Gen/Generator.cs" Line="364" Column="61" />
+      <File FileName="Data/EBEContext.cs" Line="124" Column="10" />
+      <File FileName="Gen/Utilities.cs" Line="67" Column="9" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Data" expanded="True">
+            <Node name="Mappings" expanded="True" />
+            <Node name="Repositories" expanded="True" />
+          </Node>
+          <Node name="Gen" expanded="True">
+            <Node name="Properties" expanded="True" />
+            <Node name="Generator.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
