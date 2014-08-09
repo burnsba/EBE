@@ -1,0 +1,315 @@
+<html>
+<head>
+<script>
+
+var eps = function(len)
+{
+        this.state = [];
+        this.state.length = len;
+        
+        this.len = len;
+        
+        for (var i=0; i<len; i++)
+        {
+                this.state[i] = 0;
+        }
+}
+
+var print_count = 0;
+
+function print_eps(e)
+{
+        print_count++;
+        var len = e.len;
+        
+        var msg = '';
+        var i;
+        
+        for(i=0; i<len - 1; i++)
+        {
+                if (e.state[i] < 0)
+                {                       
+                        for (var j=e.state[i]; j<0; j++)
+                        {
+                                msg += '(';
+                        }
+                        
+                        msg += 'a+';
+                }
+                else if (e.state[i] > 0)
+                {
+                        msg += 'a';
+                        
+                        for (var j=e.state[i]; j>0; j--)
+                        {
+                                msg += ')';
+                        }
+                        
+                        msg += '+';
+                }
+                else
+                {
+                        msg += 'a+';
+                }
+        }
+        
+        if (e.state[i] < 0)
+        {                       
+                for (var j=e.state[i]; j<0; j++)
+                {
+                        msg += '(';
+                }
+                
+                msg += 'a';
+        }
+        else if (e.state[i] > 0)
+        {
+                msg += 'a';
+                
+                for (var j=e.state[i]; j>0; j--)
+                {
+                        msg += ')';
+                }
+        }
+        else
+        {
+                msg += 'a';
+        }
+        
+        console.log(msg);
+}
+
+function iter_eps(e, sub_start, sub_len, depth)
+{
+        var choose;
+        var times;
+        
+        var choose_start = 0;
+        var choose_position = [];
+        choose_position.length = sub_len;
+        
+        var choose_count;
+        
+        var output_count = 0;
+        
+        for (choose=sub_len; choose>=2; choose--)
+        {
+                var f = Math.floor(sub_len/choose);
+                f++;
+                for (times=1; times<=f; times++)
+                {
+                        if (choose*times > sub_len)
+                        {
+                                continue;
+                        }
+                        
+                        console.log('choose: ' + choose + ', times: ' + times);
+                        
+                        if (choose == 2 && times == 3 && print_count > 1700)
+                        {
+                                var a = 1;
+                        }
+                        
+                        choose_start = sub_start;
+                        
+                        for (var i=0; i<sub_len; i++)
+                        {
+                                choose_position[i] = -1;
+                        }
+
+                        for (var i=0; i<times; i++)
+                        {
+                                choose_position[i] = choose_start;
+                                choose_start += choose;                     
+                        }
+                        
+                        var do_the_choose = true;
+                        
+                        if (choose*times == sub_len && times == 1)
+                        {
+                                do_the_choose = false;
+                        }
+                        
+                        while (do_the_choose)
+                        {
+                                for (choose_count = 0; choose_count < times; choose_count++)
+                                {
+                                        e.state[choose_position[choose_count]]--;
+                                        e.state[choose_position[choose_count] + choose - 1]++;        
+                                }
+                                
+                                print_eps(e);
+                                
+                                if (choose > 2 && choose < sub_len)
+                                {
+                                        for (choose_count = 0; choose_count < times; choose_count++)
+                                        {                                        
+                                                iter_eps(e, choose_position[choose_count], choose, depth + 1);        
+                                        }
+                                }
+ 
+                                // undo state increment
+                                for (choose_count = 0; choose_count < times; choose_count++)
+                                {
+                                        e.state[choose_position[choose_count]]++;
+                                        e.state[choose_position[choose_count] + choose - 1]--;
+                                }
+
+                                
+                                var inc_position = true;
+                                var curr = times;
+
+                                while (inc_position)
+                                {
+                                        curr--;
+                                        
+                                        choose_position[curr]++;
+                                        
+                                        for (var i=curr + 1; i<times && i<sub_len; i++)
+                                        {
+                                                choose_position[i] = choose_position[i - 1] + choose;
+                                        }
+                                        
+                                        if (choose_position[times - 1] + choose <= sub_len + sub_start)
+                                        {
+                                                inc_position = false;
+                                                break;
+                                        }
+                                        
+                                        if (curr == 0)
+                                        {
+                                                break;
+                                        }
+                                }
+                                
+                                if (choose_position[times - 1] + choose > sub_len + sub_start)
+                                {
+                                        do_the_choose = false;
+                                }
+                        }
+                }
+        }
+}
+
+var pascals_triangle = null;
+
+function build_traingle()
+{
+        if (pascals_triangle != null)
+        {
+                return;
+        }
+        
+        var i,j;
+        
+        var p = [30];
+        
+        for (i=0; i<30; i++)
+        {
+                p[i] = [];
+                
+                p[0][i] = 1;
+
+                p[i][0] = 1;
+        }
+        
+        for (i=1; i<30; i++)
+        {
+                for (j=1; j<30; j++)
+                {
+                        p[i][j] = p[i - 1][j] + p[i][j - 1];
+                }
+        }
+        
+        pascals_triangle = p;
+}
+
+var eps_count = [];
+
+function build_eps_count()
+{
+        build_traingle();
+        
+        eps_count[0] = 0;
+        eps_count[1] = 1;
+        eps_count[2] = 1;
+        
+        for (var n=3; n<30; n++)
+        {
+                var sum = 0;
+                
+                for (var choose=2; choose<=n; choose++)
+                {
+                        var f = Math.floor(n/choose);
+                        f++;
+                        for (var times=1; times<=f; times++)
+                        {
+                                if (choose*times > n)
+                                {
+                                        continue;
+                                }
+                                
+                                if (choose == n && times == 1)
+                                {
+                                        sum += 1;
+                                }
+                                else
+                                {
+                                        if (times == 1 || choose < 3)
+                                        {
+                                                sum += pascals_triangle[times][n - (choose*times)] * eps_count[choose];
+                                        }
+                                        else
+                                        {
+                                                sum += pascals_triangle[times][n - (choose*times)] * ((eps_count[choose] - 1) * times + 1);
+                                        }
+                                }
+                        }
+                }
+                
+                eps_count[n] = sum;
+        }
+}
+
+// debug helper
+function ddd(n)
+{
+        print_count = 0;
+        var e = new eps(n);
+        
+        print_eps(e);
+        
+        iter_eps(e, 0, n, 1);
+        console.log('print_count: ' + print_count);
+}
+
+/*
+
+a
+
+a+a
+
+a+a+a
+(a+a)+a
+a+(a+a)
+
+a+a+a+a
+(a+a+a)+a
+((a+a)+a)+a
+(a+(a+a))+a
+a+(a+a+a)
+a+((a+a)+a)
+a+(a+(a+a))
+(a+a)+a+a
+a+(a+a)+a
+a+a+(a+a)
+(a+a)+(a+a)
+
+*/
+
+</script>
+<body>
+<div id="a"></div>
+</body>
+</head>
+</html>

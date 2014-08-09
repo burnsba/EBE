@@ -1,0 +1,8 @@
+raw input: a+a
+cleaned intput: a+a
+parsed intput: (a+a)
+variables: 1
+slots: 2
+max_bits: 1
+0,0,
+eval md5: d8eada1de0f744e8f2d11cc5ea02451d
