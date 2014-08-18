@@ -32,7 +32,6 @@ namespace EBE.Core.Evaluation
         {
             _variables = new Dictionary<string, int>();
             _variableKeys = new List<string>();
-
             _maxBits = maxBits;
         }
 
@@ -83,18 +82,18 @@ namespace EBE.Core.Evaluation
         {
             List<Token> tokens = new List<Token>();
             StringReader reader = new StringReader(expression);
-
             //Tokenize the expression
             Token t = null;
+
             do
             {
                 t = new Token(reader);
                 tokens.Add(t);
-            } while (t.type != Token.TokenType.EXPR_END);
+            }
+            while (t.type != Token.TokenType.EXPR_END);
 
             //Use a minimal version of the Shunting Yard algorithm to transform the token list to polish notation
             List<Token> polishNotation = TransformToPolishNotation(tokens);
-
             var enumerator = polishNotation.GetEnumerator();
             enumerator.MoveNext();
             Root = Make(ref enumerator);
@@ -110,15 +109,14 @@ namespace EBE.Core.Evaluation
             {
                 ExpressionNode lit = new ExpressionNode();
                 lit.Value = polishNotationTokensEnumerator.Current.value;
-
                 int intValue = 0;
 
-                if(rgx.IsMatch(lit.Value))
+                if (rgx.IsMatch(lit.Value))
                 {
                     intValue = int.Parse(lit.Value);
                 }
 
-                if(!_variables.ContainsKey(lit.Value))
+                if (!_variables.ContainsKey(lit.Value))
                 {
                     _variables.Add(lit.Value, intValue);
                     _variableKeys.Add(lit.Value);
@@ -137,7 +135,7 @@ namespace EBE.Core.Evaluation
                 node.Right = Make(ref polishNotationTokensEnumerator);
                 return node;
             }
-            
+
             return null;
         }
 
@@ -150,8 +148,8 @@ namespace EBE.Core.Evaluation
         {
             Queue<Token> outputQueue = new Queue<Token>();
             Stack<Token> stack = new Stack<Token>();
-
             int index = 0;
+
             while (infixTokenList.Count > index)
             {
                 Token t = infixTokenList[index];
@@ -159,31 +157,38 @@ namespace EBE.Core.Evaluation
                 switch (t.type)
                 {
                     case Token.TokenType.LITERAL:
-                    outputQueue.Enqueue(t);
-                    break;
+                        outputQueue.Enqueue(t);
+                        break;
+
                     case Token.TokenType.TBINARY_OP:
                     case Token.TokenType.BINARY_OP:
                     case Token.TokenType.UNARY_OP:
                     case Token.TokenType.OPEN_PAREN:
-                    stack.Push(t);
-                    break;
+                        stack.Push(t);
+                        break;
+
                     case Token.TokenType.CLOSE_PAREN:
-                    while (stack.Peek().type != Token.TokenType.OPEN_PAREN)
-                    {
-                        outputQueue.Enqueue(stack.Pop());
-                    }
-                    stack.Pop();
-                    if (stack.Count > 0 && stack.Peek().type == Token.TokenType.UNARY_OP)
-                    {
-                        outputQueue.Enqueue(stack.Pop());
-                    }
-                    break;
+                        while (stack.Peek().type != Token.TokenType.OPEN_PAREN)
+                        {
+                            outputQueue.Enqueue(stack.Pop());
+                        }
+
+                        stack.Pop();
+
+                        if (stack.Count > 0 && stack.Peek().type == Token.TokenType.UNARY_OP)
+                        {
+                            outputQueue.Enqueue(stack.Pop());
+                        }
+
+                        break;
+
                     default:
-                    break;
+                        break;
                 }
 
                 ++index;
             }
+
             while (stack.Count > 0)
             {
                 outputQueue.Enqueue(stack.Pop());

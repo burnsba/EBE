@@ -18,8 +18,8 @@ namespace EBE.Data
         private static ISessionFactory SessionFactory
         {
             get
-            { 
-                lock(_lock)
+            {
+                lock (_lock)
                 {
                     return _sessionFactory;
                 }
@@ -38,14 +38,12 @@ namespace EBE.Data
         public IRepository<Encyclopedia> Encyclopedia
         {
             get;
-
             private set;
         }
 
         public IRepository<Gen> Gen
         {
             get;
-
             private set;
         }
 
@@ -53,12 +51,12 @@ namespace EBE.Data
         {
             Setup();
 
-            if(Encyclopedia == null)
+            if (Encyclopedia == null)
             {
                 Encyclopedia = new Repository<Encyclopedia>();
             }
 
-            if(Gen == null)
+            if (Gen == null)
             {
                 Gen = new Repository<Gen>();
             }
@@ -67,7 +65,7 @@ namespace EBE.Data
         internal void TransactSave(object obj)
         {
             using (ISession session = OpenSession())
-                using (ITransaction transaction = session.BeginTransaction())
+            using (ITransaction transaction = session.BeginTransaction())
             {
                 session.Save(obj);
                 transaction.Commit();
@@ -77,7 +75,7 @@ namespace EBE.Data
         internal void TransactUpdate(object obj)
         {
             using (ISession session = OpenSession())
-                using (ITransaction transaction = session.BeginTransaction())
+            using (ITransaction transaction = session.BeginTransaction())
             {
                 session.Update(obj);
                 transaction.Commit();
@@ -87,7 +85,7 @@ namespace EBE.Data
         internal void TransactDelete(object obj)
         {
             using (ISession session = OpenSession())
-                using (ITransaction transaction = session.BeginTransaction())
+            using (ITransaction transaction = session.BeginTransaction())
             {
                 session.Delete(obj);
                 transaction.Commit();
@@ -107,12 +105,11 @@ namespace EBE.Data
             using (ISession session = _sessionFactory.OpenSession())
             {
                 var results = session.CreateCriteria<T>()
-                                .Add(Restrictions.Eq(propertyName, value))
-                                .List<T>();
-
+                              .Add(Restrictions.Eq(propertyName, value))
+                              .List<T>();
                 List<T> list = new List<T>();
 
-                foreach(var r in results)
+                foreach (var r in results)
                 {
                     list.Add(r);
                 }
@@ -126,13 +123,12 @@ namespace EBE.Data
             using (ISession session = _sessionFactory.OpenSession())
             {
                 var results = session.CreateCriteria<T>()
-                    .Add(Restrictions.Eq(propertyName, value))
-                    .Add(Restrictions.Eq(propertyName2, value2))
-                        .List<T>();
-
+                              .Add(Restrictions.Eq(propertyName, value))
+                              .Add(Restrictions.Eq(propertyName2, value2))
+                              .List<T>();
                 List<T> list = new List<T>();
 
-                foreach(var r in results)
+                foreach (var r in results)
                 {
                     list.Add(r);
                 }
@@ -143,15 +139,14 @@ namespace EBE.Data
 
         private void Setup()
         {
-            if(_created == false)
+            if (_created == false)
             {
-                lock(_lock)
+                lock (_lock)
                 {
                     _configuration = new Configuration();
                     _configuration.Configure();
                     _configuration.AddAssembly(typeof(Encyclopedia).Assembly);
                     _sessionFactory = _configuration.BuildSessionFactory();
-
                     _created = true;
                 }
             }
@@ -164,7 +159,6 @@ namespace EBE.Data
             var cfg = new Configuration();
             cfg.Configure();
             cfg.AddAssembly(typeof (Encyclopedia).Assembly);
-
             new SchemaExport(cfg);
             //new SchemaExport(cfg).Execute(false, true, false, false);
         }

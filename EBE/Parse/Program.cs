@@ -13,22 +13,25 @@ namespace EBE.Parse
             bool show_help = false;
             bool showVersion = false;
             int maxBits = 1;
-
             string rawExpression = String.Empty;
-
-            var p = new OptionSet () {
+            var p = new OptionSet ()
+            {
                 { "b|bits=", "Max number of bits to use when evaluating expression (default=1)",
-                    (int v) => maxBits = v },
-                { "v|version", "Print version information",
-                    v => showVersion = true },
-                { "h|help",  "show this message and exit", 
-                    v => show_help = v != null },
+                    (int v) => maxBits = v
+                },
+                {
+                    "v|version", "Print version information",
+                    v => showVersion = true
+                },
+                {
+                    "h|help",  "show this message and exit",
+                    v => show_help = v != null
+                },
             };
 
             try
             {
                 var r = p.Parse (args);
-
                 r.ForEach(x => rawExpression += x);
             }
             catch
@@ -37,34 +40,29 @@ namespace EBE.Parse
                 return;
             }
 
-            if(showVersion)
+            if (showVersion)
             {
                 ShowVersion();
                 return;
             }
 
-            if(show_help)
+            if (show_help)
             {
                 ShowHelp (p);
                 return;
             }
 
-            if(maxBits < 1)
+            if (maxBits < 1)
             {
                 Console.WriteLine("Max bit must be greater or equal to 1.");
                 return;
             }
 
             Expression expression = new Expression(maxBits);
-
             expression.Parse(rawExpression);
-
             Evaluator e = new Evaluator(expression, expression.VariableKeys.Count, maxBits);
-
             Console.WriteLine("Expression: " + rawExpression);
-
             var result = e.Eval();
-
             Console.WriteLine(
                 result == null
                 ? "null"

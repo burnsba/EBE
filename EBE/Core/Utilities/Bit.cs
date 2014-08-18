@@ -7,7 +7,6 @@ namespace EBE.Core.Utilities
         public static byte[] GetBytes(string hex)
         {
             //http://stackoverflow.com/questions/321370/convert-hex-string-to-byte-array
-
             if (hex.Length % 2 == 1)
                 throw new Exception("The binary key cannot have an odd number of digits");
 
@@ -40,17 +39,17 @@ namespace EBE.Core.Utilities
         public static int GetHighestBit(uint v)
         {
             int i;
-
             uint r = 0; // result of log2(v) will go here
+
             for (i = 4; i >= 0; i--) // unroll for speed...
             {
                 if ((v & HighestBit_b[i]) > 0)
                 {
                     v >>= (int)HighestBit_S[i];
-                    #pragma warning disable 0675
+#pragma warning disable 0675
                     r |= HighestBit_S[i];
-                    #pragma warning restore 0675
-                } 
+#pragma warning restore 0675
+                }
             }
 
             return (int)r;

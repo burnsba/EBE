@@ -70,6 +70,7 @@ namespace EBE.Core.Evaluation
         public Token(StringReader s)
         {
             int c = s.Read();
+
             if (c == -1)
             {
                 type = TokenType.EXPR_END;
@@ -78,14 +79,13 @@ namespace EBE.Core.Evaluation
             }
 
             char ch = (char)c;
-
             string str = String.Empty;
 
-            if(ch == ':')
+            if (ch == ':')
             {
                 str += ch;
 
-                if(s.Peek() == -1 && s.Peek() == ':')
+                if (s.Peek() == -1 && s.Peek() == ':')
                 {
                     type = TokenType.MALFORMED;
                     return;
@@ -97,14 +97,14 @@ namespace EBE.Core.Evaluation
                 }
                 while (s.Peek() != -1 && s.Peek() != ':');
 
-                if(s.Peek() == ':')
+                if (s.Peek() == ':')
                 {
                     str += (char)s.Read();
                 }
 
                 value = str;
 
-                if(str.Length == 3)
+                if (str.Length == 3)
                 {
                     type = TokenType.TBINARY_OP;
                 }
@@ -112,6 +112,7 @@ namespace EBE.Core.Evaluation
                 {
                     type = TokenType.BINARY_OP;
                 }
+
                 return;
             }
 
@@ -119,7 +120,7 @@ namespace EBE.Core.Evaluation
             {
                 type = dict[ch].Key;
 
-                if(type == TokenType.TBINARY_OP)
+                if (type == TokenType.TBINARY_OP)
                 {
                     value = ch.ToString();
                 }
@@ -132,10 +133,12 @@ namespace EBE.Core.Evaluation
             {
                 str = String.Empty;
                 str += ch;
+
                 while (s.Peek() != -1 && !dict.ContainsKey((char)s.Peek()))
                 {
                     str += (char)s.Read();
                 }
+
                 type = TokenType.LITERAL;
                 value = str;
             }
@@ -143,11 +146,11 @@ namespace EBE.Core.Evaluation
 
         public override string ToString()
         {
-            if(type == TokenType.BINARY_OP)
+            if (type == TokenType.BINARY_OP)
             {
                 return "OP";
             }
-            else if(type == TokenType.LITERAL)
+            else if (type == TokenType.LITERAL)
             {
                 return value;
             }

@@ -54,7 +54,7 @@ namespace EBE.Core
         {
             get
             {
-                if(_maxBitValueSet == false)
+                if (_maxBitValueSet == false)
                 {
                     _maxBitValue = (1 << _maxBits) - 1;
                 }
@@ -78,45 +78,85 @@ namespace EBE.Core
         {
             expression = expression.Replace(":", "");
 
-            if(String.IsNullOrEmpty(expression))
+            if (String.IsNullOrEmpty(expression))
             {
                 throw new FormatException("Can not create operator from empty string.");
             }
 
-            if(expression.Count() == 1)
+            if (expression.Count() == 1)
             {
                 char c = expression[0];
 
-                switch(c)
+                switch (c)
                 {
-                case '+':
-                    return new TraditionalOperator() {MaxBits = maxBits};
-                case '-':
-                    return new TraditionalOperator() { IterationCount = 2, MaxBits = maxBits};
-                case '*':
-                    return new TraditionalOperator() { IterationCount = 3, MaxBits = maxBits};
-                case '/':
-                    return new TraditionalOperator() { IterationCount = 4, MaxBits = maxBits};
-                case '%':
-                    return new TraditionalOperator() { IterationCount = 5, MaxBits = maxBits};
-                case '<':
-                    return new TraditionalOperator() { IterationCount = 6, MaxBits = maxBits};
-                case '>':
-                    return new TraditionalOperator() { IterationCount = 7, MaxBits = maxBits};
-                case '&':
-                    return new TraditionalOperator() { IterationCount = 8, MaxBits = maxBits};
-                case '|':
-                    return new TraditionalOperator() { IterationCount = 9, MaxBits = maxBits};
-                case '^':
-                        return new TraditionalOperator() { IterationCount = 10, MaxBits = maxBits};
-                default:
-                    throw new FormatException("Unrecognized operator: " + expression);
+                    case '+':
+                        return new TraditionalOperator()
+                        {
+                            MaxBits = maxBits
+                        };
+
+                    case '-':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 2, MaxBits = maxBits
+                        };
+
+                    case '*':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 3, MaxBits = maxBits
+                        };
+
+                    case '/':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 4, MaxBits = maxBits
+                        };
+
+                    case '%':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 5, MaxBits = maxBits
+                        };
+
+                    case '<':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 6, MaxBits = maxBits
+                        };
+
+                    case '>':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 7, MaxBits = maxBits
+                        };
+
+                    case '&':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 8, MaxBits = maxBits
+                        };
+
+                    case '|':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 9, MaxBits = maxBits
+                        };
+
+                    case '^':
+                        return new TraditionalOperator()
+                        {
+                            IterationCount = 10, MaxBits = maxBits
+                        };
+
+                    default:
+                        throw new FormatException("Unrecognized operator: " + expression);
                 }
             }
 
             var ids = expression.Split('.');
 
-            if(ids.Count() < 3 || ids.Count() > 4)
+            if (ids.Count() < 3 || ids.Count() > 4)
             {
                 throw new FormatException("Bit expression operator is malformed: " + expression);
             }
@@ -124,17 +164,15 @@ namespace EBE.Core
             int internalInputCount = int.Parse(ids[0]);
             int internalOutputCount = int.Parse(ids[1]);
             int id = int.Parse(ids[2]);
-
             List<int> internalOutputId = null;
 
-            if(ids.Length > 3)
+            if (ids.Length > 3)
             {
                 internalOutputId = ids[3].Split('-').ToList().Select(x => int.Parse(x)).ToList();
             }
 
             Operator op = new Operator(internalInputCount, internalOutputCount, id, internalOutputId);
             op.MaxBits = maxBits;
-
             return op;
         }
     }

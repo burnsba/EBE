@@ -45,7 +45,7 @@ namespace EBE.Data
             }
         }
 
-        public List<T> Find(string propertyName, object value) 
+        public List<T> Find(string propertyName, object value)
         {
             using(var context = new EBEContext())
             {

@@ -24,11 +24,9 @@ namespace EBE.Core.Evaluation
             {
                 return _operator;
             }
-
             set
             {
                 _operator = value;
-
                 _nodeType = NodeType.Node;
             }
         }
@@ -42,11 +40,9 @@ namespace EBE.Core.Evaluation
             {
                 return _value;
             }
-
             set
             {
                 _value = value;
-
                 _nodeType = NodeType.Leaf;
             }
         }
@@ -60,11 +56,9 @@ namespace EBE.Core.Evaluation
             {
                 return _left;
             }
-
             set
             {
                 _left = value;
-
                 _nodeType = (_left != null || _right != null) ? NodeType.Node : NodeType.Leaf;
             }
         }
@@ -78,11 +72,9 @@ namespace EBE.Core.Evaluation
             {
                 return _right;
             }
-
             set
             {
                 _right = value;
-
                 _nodeType = (_left != null || _right != null) ? NodeType.Node : NodeType.Leaf;
             }
         }
@@ -104,16 +96,16 @@ namespace EBE.Core.Evaluation
         /// <returns>A <see cref="System.String"/> that represents the current <see cref="EBE.Core.Evaluation.ExpressionNode"/>.</returns>
         public override string ToString()
         {
-            if(NodeType == NodeType.Leaf)
+            if (NodeType == NodeType.Leaf)
             {
                 return Value;
             }
 
             string s = String.Empty;
 
-            if(_left != null)
+            if (_left != null)
             {
-                if(_left.NodeType == NodeType.Leaf)
+                if (_left.NodeType == NodeType.Leaf)
                 {
                     s += _left.Value;
                 }
@@ -129,9 +121,9 @@ namespace EBE.Core.Evaluation
 
             s += " " + _operator.ToString() + " ";
 
-            if(_right != null)
+            if (_right != null)
             {
-                if(_right.NodeType == NodeType.Leaf)
+                if (_right.NodeType == NodeType.Leaf)
                 {
                     s += _right.Value;
                 }

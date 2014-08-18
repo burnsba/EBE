@@ -14,6 +14,7 @@ namespace EBE.Core.Utilities
         public static string ReplaceFirst(string text, string search, string replace)
         {
             int pos = text.IndexOf(search);
+
             if (pos < 0)
             {
                 return text;

@@ -39,9 +39,7 @@ namespace EBE.Core.Evaluation
         public Evaluator(string expression, int numSlots, int maxBits)
         {
             _expression = new Expression(maxBits);
-
             _expression.Parse(expression);
-
             PostConstructor(_expression, numSlots, maxBits);
         }
 
@@ -54,7 +52,6 @@ namespace EBE.Core.Evaluation
         public Evaluator(Expression expression, int numSlots, int maxBits)
         {
             _expression = expression;
-
             PostConstructor(_expression, numSlots, maxBits);
         }
 
@@ -69,14 +66,13 @@ namespace EBE.Core.Evaluation
             _variables = _expression.Variables;
             _variableKeys = _expression.VariableKeys;
 
-            foreach(var key in _variableKeys)
+            foreach (var key in _variableKeys)
             {
                 _variables[key] = _expression.Variables[key];
             }
 
             _numVariables = _variables.Keys.Count;
             _numSlots = numSlots;
-
             // sets _maxVariableValue too
             MaxBits = maxBits;
         }
@@ -107,11 +103,9 @@ namespace EBE.Core.Evaluation
             {
                 return _maxBits;
             }
-
             set
             {
                 _maxBits = value;
-
                 _maxVariableValue = (1 << (_maxBits)) - 1;
             }
         }
@@ -201,16 +195,16 @@ namespace EBE.Core.Evaluation
         /// </summary>
         public bool MoveNext()
         {
-            if(_doneIterating)
+            if (_doneIterating)
             {
                 return false;
             }
 
-            foreach(var key in _variableKeys)
+            foreach (var key in _variableKeys)
             {
                 _variables[key] = _variables[key] + 1;
 
-                if(_variables[key] > _maxVariableValue)
+                if (_variables[key] > _maxVariableValue)
                 {
                     _variables[key] = 0;
                 }
@@ -221,13 +215,12 @@ namespace EBE.Core.Evaluation
             }
 
             // couldn't increment, all values are zero so reset to maxvalue
-            foreach(var key in _variableKeys)
+            foreach (var key in _variableKeys)
             {
                 _variables[key] = _maxVariableValue;
             }
 
             _doneIterating = true;
-
             return false;
         }
 
@@ -246,17 +239,16 @@ namespace EBE.Core.Evaluation
         /// <param name="node">Node to parse.</param>
         private int? EvalHelper(ExpressionNode node)
         {
-            if(node.NodeType == NodeType.Leaf)
+            if (node.NodeType == NodeType.Leaf)
             {
                 return _variables[node.Value];
             }
 
             int left;
             int right;
-
             int? leftn = EvalHelper(node.Left);
 
-            if(leftn.HasValue)
+            if (leftn.HasValue)
             {
                 left = leftn.Value;
             }
@@ -267,7 +259,7 @@ namespace EBE.Core.Evaluation
 
             int? rightn = EvalHelper(node.Right);
 
-            if(rightn.HasValue)
+            if (rightn.HasValue)
             {
                 right = rightn.Value;
             }
@@ -275,7 +267,7 @@ namespace EBE.Core.Evaluation
             {
                 return null;
             }
-          
+
             return node.Operator.Eval(left, right);
         }
     }

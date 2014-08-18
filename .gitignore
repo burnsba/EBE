@@ -1,5 +1,6 @@
 /gitignore
 **hibernate.cfg.xml
+**.orig
 /EBE/Data/bin
 /EBE/Gen/bin
 /EBE/Parse/bin

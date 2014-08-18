@@ -5,8 +5,8 @@ namespace EBE.Core
     /// <summary>
     /// Placeholder values while generating expression.
     /// </summary>
-	public static class Placeholder
-	{
+    public static class Placeholder
+    {
         /// <summary>
         /// Preliminary operator placeholder.
         /// </summary>
@@ -20,6 +20,6 @@ namespace EBE.Core
         /// <summary>
         /// Variable placeholder.
         /// </summary>
-		public const string Var = "s";
-	}
+        public const string Var = "s";
+    }
 }

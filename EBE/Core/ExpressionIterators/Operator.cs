@@ -18,28 +18,28 @@ namespace EBE.Core.ExpressionIterators
         public const int MaxInternalInput = 1;
         public const int MaxInternalOutput = 0;
 
-        [DataMember(Name="InternalInputCount", Order = 2)]
+        [DataMember(Name = "InternalInputCount", Order = 2)]
         private int _internalInputCount;
 
-        [DataMember(Name="InternalOutputCount", Order = 3)]
+        [DataMember(Name = "InternalOutputCount", Order = 3)]
         private int _internalOutputCount;
 
-        [DataMember(Name="NumberCombinations", Order = 4)]
+        [DataMember(Name = "NumberCombinations", Order = 4)]
         private int _numberCombinations;
 
-        [DataMember(Name="DegreesOfFreedom", Order = 5)]
+        [DataMember(Name = "DegreesOfFreedom", Order = 5)]
         private int _degreesOfFreedom;
 
-        [DataMember(Name="InternalOutputEvalMap", Order = 6)]
+        [DataMember(Name = "InternalOutputEvalMap", Order = 6)]
         private List<int[]> _internalOutputEvalMap;
 
-        [DataMember(Name="InternalOutputId", Order = 7)]
+        [DataMember(Name = "InternalOutputId", Order = 7)]
         private List<int> _internalOutputId;
 
-        [DataMember(Name="OutputEvalMap", Order = 8)]
+        [DataMember(Name = "OutputEvalMap", Order = 8)]
         private int[] _outputEvalMap;
 
-        [DataMember(Name="OutputEvalMap", Order = 9)]
+        [DataMember(Name = "OutputEvalMap", Order = 9)]
         private int _traditionalOperatorIndex = 1;
 
         private TraditionalOperator _toperator;
@@ -58,31 +58,27 @@ namespace EBE.Core.ExpressionIterators
         /// <param name="id">Id.</param>
         /// <param name="internalOutputId">Internal output identifier.</param>
         public Operator(int internalInputCount, int internalOutputCount, int id, List<int> internalOutputId)
-            : base(OperatorType.Bit)
+        : base(OperatorType.Bit)
         {
-            if(internalOutputId == null && _internalOutputCount != 0)
+            if (internalOutputId == null && _internalOutputCount != 0)
             {
                 throw new ArgumentException("InternalOutputCount is set, but no id is given.");
             }
 
-            if(internalOutputId != null && internalOutputId.Count != internalOutputCount)
+            if (internalOutputId != null && internalOutputId.Count != internalOutputCount)
             {
                 throw new ArgumentException("Number of ids does not match number of internalOutputCount.");
             }
 
             _internalInputCount = internalInputCount;
             _internalOutputCount = internalOutputCount;
-
             Id = id;
-
             _internalOutputEvalMap = new List<int[]>();
             _internalOutputId = new List<int>();
-
             int right = 1 << (1 + _internalOutputCount);
-
             int pow = 1 << (_internalInputCount + 2);
 
-            if(right == 2)
+            if (right == 2)
             {
                 _numberCombinations = 1 << pow;
             }
@@ -93,7 +89,7 @@ namespace EBE.Core.ExpressionIterators
 
             _degreesOfFreedom = 2 + 1 + _internalInputCount + _internalOutputCount;
 
-            if(_outputEvalMap != null && _outputEvalMap.Length == _numberCombinations)
+            if (_outputEvalMap != null && _outputEvalMap.Length == _numberCombinations)
             {
                 ResetArray(Id, ref _outputEvalMap);
             }
@@ -102,7 +98,7 @@ namespace EBE.Core.ExpressionIterators
                 _outputEvalMap = SetArray(Id);
             }
 
-            for(int i=0; i<_internalOutputCount; i++)
+            for (int i = 0; i < _internalOutputCount; i++)
             {
                 _internalOutputId.Add(internalOutputId[i]);
                 _internalOutputEvalMap.Add(SetArray(internalOutputId[i]));
@@ -118,7 +114,7 @@ namespace EBE.Core.ExpressionIterators
         {
             get
             {
-                if(_toperator == null)
+                if (_toperator == null)
                 {
                     _toperator = new TraditionalOperator();
                 }
@@ -131,15 +127,13 @@ namespace EBE.Core.ExpressionIterators
         {
             List<int> outputIds = new List<int>();
 
-            for(int i=0; i<_internalOutputCount; i++)
+            for (int i = 0; i < _internalOutputCount; i++)
             {
                 outputIds.Add(0);
             }
 
             Reset(0, outputIds);
-
             _toStringIsDirty = true;
-
             // can't call base.Reset on abstract class
             DoneIterating = false;
             IterationCount = 1;
@@ -148,12 +142,10 @@ namespace EBE.Core.ExpressionIterators
         private void Reset(int id, List<int> internalOutputId)
         {
             Id = id;
-
             int right = 1 << (1 + _internalOutputCount);
-
             int pow = 1 << (_internalInputCount + 2);
 
-            if(right == 2)
+            if (right == 2)
             {
                 _numberCombinations = 1 << pow;
             }
@@ -164,7 +156,7 @@ namespace EBE.Core.ExpressionIterators
 
             _degreesOfFreedom = 2 + 1 + _internalInputCount + _internalOutputCount;
 
-            if(_outputEvalMap != null && _outputEvalMap.Length == _numberCombinations)
+            if (_outputEvalMap != null && _outputEvalMap.Length == _numberCombinations)
             {
                 ResetArray(Id, ref _outputEvalMap);
             }
@@ -173,7 +165,7 @@ namespace EBE.Core.ExpressionIterators
                 _outputEvalMap = SetArray(Id);
             }
 
-            for(int i=0; i<_internalOutputCount; i++)
+            for (int i = 0; i < _internalOutputCount; i++)
             {
                 _internalOutputId[i] = internalOutputId[i];
                 _internalOutputEvalMap[i] = SetArray(internalOutputId[i]);
@@ -232,21 +224,20 @@ namespace EBE.Core.ExpressionIterators
 
         public override bool MoveNext()
         {
-            if(DoneIterating && _traditionalOperatorIndex >= TraditionalOperator.OperatorsLength)
+            if (DoneIterating && _traditionalOperatorIndex >= TraditionalOperator.OperatorsLength)
             {
                 return false;
             }
-            else if(!DoneIterating)
+            else if (!DoneIterating)
             {
-
-                if(_internalOutputId != null)
+                if (_internalOutputId != null)
                 {
                     bool incremented = false;
-
                     int i;
-                    for(i=0; i<_internalOutputCount; i++)
+
+                    for (i = 0; i < _internalOutputCount; i++)
                     {
-                        if(_internalOutputId[i] < _numberCombinations - 1)
+                        if (_internalOutputId[i] < _numberCombinations - 1)
                         {
                             _internalOutputId[i] = _internalOutputId[i] + 1;
                             incremented = true;
@@ -259,36 +250,34 @@ namespace EBE.Core.ExpressionIterators
                         }
                     }
 
-                    if(incremented)
+                    if (incremented)
                     {
                         _toStringInternalOutputIdIsDirty = true;
-
                         Reset(Id, _internalOutputId);
                         return true;
                     }
                 }
 
-                if(Id < _numberCombinations - 1)
+                if (Id < _numberCombinations - 1)
                 {
                     _toStringIsDirty = true;
                     _toStringInternalOutputIdIsDirty = true;
                     IterationCount++;
-
                     Reset(Id + 1, _internalOutputId);
                     return true;
                 }
 
-                if(_internalInputCount == _internalOutputCount)
+                if (_internalInputCount == _internalOutputCount)
                 {
-                    if(_internalInputCount + 1 <= MaxInternalInput)
+                    if (_internalInputCount + 1 <= MaxInternalInput)
                     {
                         _toStringIsDirty = true;
                         _toStringInternalOutputIdIsDirty = true;
                         _internalInputCount++;
                         IterationCount++;
-
                         List<int> outputIds = new List<int>();
-                        for(int i=0; i<_internalOutputCount; i++)
+
+                        for (int i = 0; i < _internalOutputCount; i++)
                         {
                             outputIds.Add(0);
                         }
@@ -298,17 +287,16 @@ namespace EBE.Core.ExpressionIterators
                     }
                 }
 
-                if(_internalOutputCount + 1 <= MaxInternalOutput)
+                if (_internalOutputCount + 1 <= MaxInternalOutput)
                 {
                     _internalOutputCount++;
                     IterationCount++;
-
                     List<int> outputIds = new List<int>();
-                    for(int i=0; i<_internalOutputCount; i++)
+
+                    for (int i = 0; i < _internalOutputCount; i++)
                     {
                         _toStringIsDirty = true;
                         _toStringInternalOutputIdIsDirty = true;
-
                         outputIds.Add(0);
                         _internalOutputId.Add(0);
                         _internalOutputEvalMap.Add(new int[1]);
@@ -325,7 +313,7 @@ namespace EBE.Core.ExpressionIterators
             {
                 _traditionalOperatorIndex++;
 
-                if(TOperator.MoveNext())
+                if (TOperator.MoveNext())
                 {
                     return true;
                 }
@@ -338,18 +326,17 @@ namespace EBE.Core.ExpressionIterators
         {
             string output = String.Empty;
 
-            if(!DoneIterating)
+            if (!DoneIterating)
             {
-                if(_toStringIsDirty == true)
+                if (_toStringIsDirty == true)
                 {
                     _toStringValue = String.Format("{0}.{1}.{2}", _internalInputCount, _internalOutputCount, Id);
-
                     _toStringIsDirty = false;
                 }
 
-                if(_toStringInternalOutputIdIsDirty == true)
+                if (_toStringInternalOutputIdIsDirty == true)
                 {
-                    if(_internalOutputId.Count > 0)
+                    if (_internalOutputId.Count > 0)
                     {
                         _toStringInternalOutputIdValue = "-" + String.Join("-", _internalOutputId);
                     }
@@ -370,9 +357,9 @@ namespace EBE.Core.ExpressionIterators
         private int[] SetArray(int id)
         {
             int[] arr = new int[_numberCombinations];
-
             int count = 0;
-            for(int i=1; i<_numberCombinations; i<<=1, count++)
+
+            for (int i = 1; i < _numberCombinations; i <<= 1, count++)
             {
                 arr[count] = id & 0x1;
                 id >>= 1;
@@ -384,7 +371,8 @@ namespace EBE.Core.ExpressionIterators
         private void ResetArray(int id, ref int[] arr)
         {
             int count = 0;
-            for(int i=1; i<_numberCombinations; i<<=1, count++)
+
+            for (int i = 1; i < _numberCombinations; i <<= 1, count++)
             {
                 arr[count] = id & 0x1;
                 id >>= 1;
@@ -394,10 +382,8 @@ namespace EBE.Core.ExpressionIterators
         private int BitEval(int a, int b)
         {
             int index = 0;
-
             index = (a & 0x01) << 1;
             index += (b & 0x01);
-
             return _outputEvalMap[index];
         }
 
@@ -410,23 +396,18 @@ namespace EBE.Core.ExpressionIterators
         {
             int solution = 0;
 
-            if(!DoneIterating)
+            if (!DoneIterating)
             {
-
                 int hi_a = Bit.GetHighestBit((uint)a);
                 int hi_b = Bit.GetHighestBit((uint)b);
-
                 int hi = hi_a > hi_b ? hi_a : hi_b;
-
                 int i;
                 int t;
 
-                for(i=0; i<=hi; i++)
+                for (i = 0; i <= hi; i++)
                 {
                     t = BitEval(a & 0x1, b & 0x1);
-
                     solution |= t << i;
-
                     a >>= 1;
                     b >>= 1;
                 }
@@ -435,7 +416,7 @@ namespace EBE.Core.ExpressionIterators
             {
                 int? sn = TOperator.Eval(a, b);
 
-                if(sn.HasValue)
+                if (sn.HasValue)
                 {
                     solution = sn.Value;
                 }

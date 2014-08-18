@@ -7,13 +7,13 @@ namespace EBE.Core
     [DataContract]
     public abstract class IteratorBase : IEnumerator
     {
-        [DataMember(Name="Id", Order = 1)]
+        [DataMember(Name = "Id", Order = 1)]
         private int _id;
 
-        [DataMember(Name="IterationCount", Order = 2)]
+        [DataMember(Name = "IterationCount", Order = 2)]
         private int _iterationCount = 1;
 
-        [DataMember(Name="DoneIterating", Order = 10)]
+        [DataMember(Name = "DoneIterating", Order = 10)]
         private bool _doneIterating = false;
 
         public IteratorBase()
@@ -61,7 +61,6 @@ namespace EBE.Core
             {
                 return _doneIterating;
             }
-
             set
             {
                 _doneIterating = value;
@@ -82,12 +81,18 @@ namespace EBE.Core
         /// </summary>
         public string Current
         {
-            get { return ToString(); }
+            get
+            {
+                return ToString();
+            }
         }
 
         object System.Collections.IEnumerator.Current
         {
-            get { return ToString(); }
+            get
+            {
+                return ToString();
+            }
         }
 
         /// <summary>
