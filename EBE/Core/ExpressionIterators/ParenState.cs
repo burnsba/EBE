@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using EBE.Core;
 
-namespace EBE
+namespace EBE.Core.ExpressionIterators
 {
 	/*
 	 * Some benchmarks
@@ -24,7 +25,7 @@ namespace EBE
 	/// https://oeis.org/A001003
 	/// </remarks>
     [DataContract]
-	public class ParenState : IEnumerator
+    public class ParenState : IteratorBase
 	{
 		#region Fields
 
@@ -45,25 +46,10 @@ namespace EBE
 		private readonly int _numVariables;
 
 		/// <summary>
-		/// Number of times object has been enumerated.
-		/// </summary>
-		/// <remarks>
-		/// First entry starts at 1.
-		/// </remarks>
-        [DataMember(Name="IterationCount", Order = 2)]
-		private int _iterationCount = 1;
-
-		/// <summary>
 		/// Current number of sets.
 		/// </summary>
         [DataMember(Name="SetLength", Order = 3)]
 		private int _setLength;
-
-		/// <summary>
-		/// Flag to indicate if the object can be iterated.
-		/// </summary>
-        [DataMember(Name="DoneIterating", Order = 4)]
-		private bool _doneIterating = false;
 
 		/// <summary>
 		/// Describes current sub partitions.
@@ -170,40 +156,21 @@ namespace EBE
 			}
 		}
 
-		/// <summary>
-		/// Gets the number of times object has been enumerated.
-		/// </summary>
-		public int IterationCount
-		{
-			get
-			{
-				return _iterationCount;
-			}
-		}
+        public List<int> Sets
+        {
+            get
+            {
+                return _sets;
+            }
+        }
 
-		/// <summary>
-		/// Gets the current state as an expression.
-		/// </summary>
-		public string Current
-		{
-			get { return ToString(); }
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether there additional items to iterate over.
-		/// </summary>
-		public bool CanIterate
-		{
-			get
-			{
-				return !_doneIterating;
-			}
-		}
-
-		object System.Collections.IEnumerator.Current
-		{
-			get { return ToString(); }
-		}
+        public List<ParenState> SubIps
+        {
+            get
+            {
+                return _subIps;
+            }
+        }
 
 		#endregion
 
@@ -247,9 +214,9 @@ namespace EBE
 		///             
 		/// In general, the "most significat bit" will be array index 0
 		/// </remarks>
-		public bool MoveNext()
+		public override bool MoveNext()
 		{
-			if (_doneIterating)
+			if (DoneIterating)
 			{
 				return false;
 			}
@@ -271,7 +238,7 @@ namespace EBE
 						_subIps[j].Reset();
 					}
 
-					_iterationCount++;
+					IterationCount++;
 
 					return true;
 				}
@@ -356,7 +323,7 @@ namespace EBE
 
 				if (_setLength == _numVariables)
 				{
-					_doneIterating = true;
+					DoneIterating = true;
 
 					_setLength--;
 
@@ -380,7 +347,7 @@ namespace EBE
 				_subIps.Add(new ParenState(_sets[i]));
 			}
 
-			_iterationCount++;
+			IterationCount++;
 
 			return true;
 		}
@@ -388,9 +355,11 @@ namespace EBE
 		/// <summary>
 		/// Resets the enumerator to initial conditions.
 		/// </summary>
-		public void Reset()
+		public override void Reset()
 		{
-			_doneIterating = _numVariables <= 2;
+            base.Reset();
+
+			DoneIterating = _numVariables <= 2;
 
 			_sets = new List<int>();
 
@@ -398,16 +367,6 @@ namespace EBE
 			_sets.Add(_numVariables);
 
 			_subIps.Clear();
-
-			_iterationCount = 1;
-		}
-
-		/// <summary>
-		/// Dispose.
-		/// </summary>
-		public void Dispose()
-		{
-			// nothing to do
 		}
 
 		/// <summary>

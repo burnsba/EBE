@@ -5,12 +5,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gen", "Gen\Gen.csproj", "{2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{840E12B2-7894-47A8-A53F-D3BAC51AF520}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{BA4EB9CE-A9F6-414B-9B76-DF8AB1507157}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parse", "Parse\Parse.csproj", "{195D794D-AD26-4DFC-869A-436A3844232A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{EF439C90-F3C6-487F-8214-C12E91EC5113}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{195D794D-AD26-4DFC-869A-436A3844232A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{195D794D-AD26-4DFC-869A-436A3844232A}.Debug|x86.Build.0 = Debug|Any CPU
+		{195D794D-AD26-4DFC-869A-436A3844232A}.Release|x86.ActiveCfg = Release|Any CPU
+		{195D794D-AD26-4DFC-869A-436A3844232A}.Release|x86.Build.0 = Release|Any CPU
 		{26D7DA9E-C4E4-45FF-8B6D-1FC76A64F152}.Debug|x86.ActiveCfg = Debug|x86
 		{26D7DA9E-C4E4-45FF-8B6D-1FC76A64F152}.Debug|x86.Build.0 = Debug|x86
 		{26D7DA9E-C4E4-45FF-8B6D-1FC76A64F152}.Release|x86.ActiveCfg = Release|x86
@@ -19,6 +29,14 @@ Global
 		{840E12B2-7894-47A8-A53F-D3BAC51AF520}.Debug|x86.Build.0 = Debug|Any CPU
 		{840E12B2-7894-47A8-A53F-D3BAC51AF520}.Release|x86.ActiveCfg = Release|Any CPU
 		{840E12B2-7894-47A8-A53F-D3BAC51AF520}.Release|x86.Build.0 = Release|Any CPU
+		{BA4EB9CE-A9F6-414B-9B76-DF8AB1507157}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BA4EB9CE-A9F6-414B-9B76-DF8AB1507157}.Debug|x86.Build.0 = Debug|Any CPU
+		{BA4EB9CE-A9F6-414B-9B76-DF8AB1507157}.Release|x86.ActiveCfg = Release|Any CPU
+		{BA4EB9CE-A9F6-414B-9B76-DF8AB1507157}.Release|x86.Build.0 = Release|Any CPU
+		{EF439C90-F3C6-487F-8214-C12E91EC5113}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EF439C90-F3C6-487F-8214-C12E91EC5113}.Debug|x86.Build.0 = Debug|Any CPU
+		{EF439C90-F3C6-487F-8214-C12E91EC5113}.Release|x86.ActiveCfg = Release|Any CPU
+		{EF439C90-F3C6-487F-8214-C12E91EC5113}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Gen\Gen.csproj

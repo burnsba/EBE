@@ -9,6 +9,10 @@ using Mono.Unix;
 using System.Runtime.Serialization;
 using System.Xml;
 using EBE.Data;
+using EBE.Core;
+using EBE.Core.ExpressionIterators;
+using EBE.Core.Utilities;
+using EBE.Core.Evaluation;
 
 namespace EBE
 {
@@ -207,101 +211,6 @@ namespace EBE
 
         #region Methods
 
-        private void RunEbeParse(string filename, string expression)
-        {
-            using(System.Diagnostics.Process proc = new System.Diagnostics.Process())
-            {
-                proc.EnableRaisingEvents = false; 
-                proc.StartInfo.FileName = "ebe";
-
-                // ignore output
-                proc.StartInfo.UseShellExecute = false;
-                proc.StartInfo.RedirectStandardOutput = true;
-
-                proc.StartInfo.Arguments = 
-                    String.Format("'{0}' -b {2} -o '{1}'",
-                                  expression,
-                                  filename,
-                                  _maxBits);
-
-                Console.WriteLine("ebe " + proc.StartInfo.Arguments);
-
-                proc.Start();
-                proc.WaitForExit();
-            }
-        }
-
-        private void LoadFileIntoEntry(string filename, ref Encyclopedia e)
-        {
-            // file format is:
-
-            // raw input: a+a
-            // cleaned intput: a+a
-            // parsed intput: (a+a)
-            // variables: 1
-            // slots: 2
-            // max_bits: 1
-            // 0,0,
-            // eval md5: d8eada1de0f744e8f2d11cc5ea02451d
-
-            System.IO.StreamReader file = 
-                new System.IO.StreamReader(filename);
-
-            string line;
-            int counter = 0;
-            int input;
-
-            e.Id = Guid.Empty;
-
-            while((line = file.ReadLine()) != null)
-            {
-                int start = line.IndexOf(": ") + 2;
-
-                switch(counter)
-                {
-                case 0:
-                    e.RawInput = line.Substring(start);
-                    break;
-                case 1:
-                    e.CleanedInput = line.Substring(start);
-                    break;
-                case 2:
-                    e.ParsedInput = line.Substring(start);
-                    break;
-                case 3:
-                    int.TryParse(line.Substring(start), out input);
-                    e.Variables = input;
-                    break;
-                case 4:
-                    int.TryParse(line.Substring(start), out input);
-                    e.Slots = input;
-                    break;
-                case 5:
-                    int.TryParse(line.Substring(start), out input);
-                    e.MaxBits = input;
-                    break;
-                case 6:
-                    e.RawEval = line;
-                    break;
-                case 7:
-                    byte[] b = Utilities.GetBytes(line.Substring(start));
-                    if(b.Length != 16)
-                    {
-                        break;
-                    }
-                    e.EvalId = new Guid(b);
-                    break;
-                }
-
-                counter++;
-            }
-
-            if(counter == 8)
-            {
-                e.Id = Guid.NewGuid();
-            }
-        }
-
 		public void DoWork()
 		{
 			List<string> varNames;
@@ -343,17 +252,46 @@ namespace EBE
 
 						foreach (var s in varNames)
 						{
-							output = Utilities.ReplaceFirst(output, Placeholder.Var, s);
+                            output = Extensions.ReplaceFirst(output, Placeholder.Var, s);
 						}
 
 						opValues = _op.OpValues;
 
 						foreach (var s in opValues)
 						{
-							output = Utilities.ReplaceFirst(output, Placeholder.Op, s);
+                            var sbracket = String.Format(
+                                "{0}{1}{0}",
+                                Placeholder.OpBracket,
+                                s);
+                            output = EBE.Core.Utilities.Extensions.ReplaceFirst(output, Placeholder.Op, sbracket);
 						}
 
-						line = String.Format("{0}.{1}.{2}.{3} {4}",
+                        var evalOutput = new List<string>();
+
+                        Evaluator evaluator = new Evaluator(output, _numVariables, _maxBits);
+                        do
+                        {
+                            int? val = evaluator.Eval();
+                            string s = String.Empty;
+
+                            if (!val.HasValue)
+                            {
+                                s += "n";
+                            }
+                            else
+                            {
+                                s += val.Value.ToString();
+                            }
+
+                            evalOutput.Add(s);
+                        } while(evaluator.MoveNext() && doWork);
+                        /*
+                        if (_paren.IterationCount == 7 && _var.IterationCount == 2 && _op.IterationCount == 916)
+                        {
+                            var a = 1;
+                        }
+						*/
+                        line = String.Format("{0}.{1}.{2}.{3} {4}",
 						              _numVariables,
 						              _paren.IterationCount,
 						              _var.IterationCount,
@@ -361,9 +299,13 @@ namespace EBE
 						              output);
 
 						_outputStream.WriteLine(line);
-                        _outputStream.Flush();
 
-                        string filename = Guid.NewGuid().ToString("N");
+                        //_outputStream.WriteLine(
+                        //    "Eval: " + 
+                        //    String.Join(",", evalOutput)
+                        //    );
+
+                        _outputStream.Flush();
 
                         Gen g = new Gen();
 
@@ -375,12 +317,17 @@ namespace EBE
 
                         Encyclopedia e = new Encyclopedia();
 
-                        e.GenId = g.Id;
-
-                        RunEbeParse(filename, output);
-                        LoadFileIntoEntry(filename, ref e);
-
+                        e.CleanedInput = output;
+                        e.EvalId = Crypto.CalculateMD5HashGuid(String.Join(",", evalOutput));
                         e.Gen = g;
+                        e.GenId = g.Id;
+                        e.Id = Guid.NewGuid();
+                        e.MaxBits = MaxBits;
+                        e.ParsedInput = evaluator.Expression.Root.ToString();
+                        e.RawEval = String.Join(",", evalOutput);
+                        e.RawInput = output;
+                        e.Slots = _numVariables;
+                        e.Variables = evaluator.Expression.VariableKeys.Count();
 
                         if (_context.Encyclopedia.Find(
                             "ParsedInput", e.ParsedInput,
@@ -397,15 +344,7 @@ namespace EBE
                         {
                             DbSkip++;
 
-                            //Console.WriteLine("Skipping " + e.ParsedInput);
-                        }
-
-                        try
-                        {
-                            File.Delete(filename);
-                        }
-                        catch
-                        {
+                            Console.WriteLine("Skipping " + e.ParsedInput);
                         }
 
 						_iterationCount++;

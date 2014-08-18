@@ -12,12 +12,13 @@ using System.Text.RegularExpressions;
 using Mono.Options;
 using EBE.Data;
 using System.Reflection;
+using EBE.Core.Utilities;
 
 namespace EBE
 {
 	class MainClass
 	{
-        private const string versionString = "0.0.1";
+        private const string versionString = "0.0.2";
 
 		// Catch SIGINT
 		private static UnixSignal[] signals = new UnixSignal [] {
@@ -26,13 +27,13 @@ namespace EBE
 
 		public static void Main (string[] args)
 		{
-            Utilities.LoadLibraries();
+            Application.LoadLibraries();
 
             bool show_help = false;
             bool continue_processing = false;
             bool pauseAfterEach = false;
             bool showVersion = false;
-            int numVariables = 0;
+            int numVariables = 2;
             int maxBits = 1;
 
             var p = new OptionSet () {

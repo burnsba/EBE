@@ -2,3 +2,5 @@
 **hibernate.cfg.xml
 /EBE/Data/bin
 /EBE/Gen/bin
+/EBE/Parse/bin
+/EBE/Test/bin

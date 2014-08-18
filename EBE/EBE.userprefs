@@ -1,22 +1,23 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Gen/Generator.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Test/CoreTest.cs">
     <Files>
-      <File FileName="Gen/Program.cs" Line="46" Column="28" />
-      <File FileName="Gen/Generator.cs" Line="364" Column="61" />
-      <File FileName="Data/EBEContext.cs" Line="124" Column="10" />
-      <File FileName="Gen/Utilities.cs" Line="67" Column="9" />
+      <File FileName="Test/CoreTest.cs" Line="3" Column="11" />
+      <File FileName="Core/Utilities/Math.cs" Line="14" Column="28" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="Data" expanded="True">
-            <Node name="Mappings" expanded="True" />
-            <Node name="Repositories" expanded="True" />
+          <Node name="Core" expanded="True">
+            <Node name="Evaluation" expanded="True" />
+            <Node name="ExpressionIterators" expanded="True" />
+            <Node name="Utilities" expanded="True" />
           </Node>
           <Node name="Gen" expanded="True">
-            <Node name="Properties" expanded="True" />
-            <Node name="Generator.cs" selected="True" />
+            <Node name="References" expanded="True" />
+          </Node>
+          <Node name="Test" expanded="True" selected="True">
+            <Node name="References" expanded="True" />
           </Node>
         </State>
       </Pad>

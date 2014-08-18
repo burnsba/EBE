@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace EBE
+namespace EBE.Core.ExpressionIterators
 {
 	/* Benchmarks
 	 * 
@@ -17,7 +17,7 @@ namespace EBE
 	/// Variable state.
 	/// </summary>
     [DataContract]
-	public class VarState : IEnumerator
+    public class VarState : IteratorBase
 	{
 		#region Fields
 
@@ -26,21 +26,6 @@ namespace EBE
 		/// </summary>
         [DataMember(Name="NumVariables", Order = 1)]
 		private readonly int _numVariables;
-
-		/// <summary>
-		/// Number of times object has been enumerated.
-		/// </summary>
-		/// <remarks>
-		/// First entry starts at 1.
-		/// </remarks>
-        [DataMember(Name="IterationCount", Order = 2)]
-		private int _iterationCount = 1;
-
-		/// <summary>
-		/// Flag to indicate if the object can be iterated.
-		/// </summary>
-        [DataMember(Name="DoneIterating", Order = 3)]
-		private bool _doneIterating = false;
 
 		/// <summary>
 		/// Variable state.
@@ -202,37 +187,7 @@ namespace EBE
 				}
 			}
 		}
-
-		/// <summary>
-		/// Gets the number of times object has been enumerated.
-		/// </summary>
-		public int IterationCount
-		{
-			get
-			{
-				return _iterationCount;
-			}
-		}
-
-		/// <summary>
-		/// Gets the current state.
-		/// </summary>
-		public string Current
-		{
-			get { return ToString(); }
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether there additional items to iterate over.
-		/// </summary>
-		public bool CanIterate
-		{
-			get
-			{
-				return !_doneIterating;
-			}
-		}
-
+       
 		/// <summary>
 		/// Returns a list of variables as defined by the current state.
 		/// </summary>
@@ -249,11 +204,6 @@ namespace EBE
 
 				return output;
 			}
-		}
-
-		object System.Collections.IEnumerator.Current
-		{
-			get { return ToString(); }
 		}
 
 		#endregion
@@ -279,9 +229,9 @@ namespace EBE
 		/// Advances the enumerator to the next possible variable combination.
 		/// </summary>
 		/// <returns>True if the state changed, false if there is not a next item.</returns>
-		public bool MoveNext()
+		public override bool MoveNext()
 		{
-			if (_doneIterating)
+			if (DoneIterating)
 			{
 				return false;
 			}
@@ -305,7 +255,7 @@ namespace EBE
 				{
 					_state[cursor]++;
 
-					_iterationCount++;
+					IterationCount++;
 
 					return true;
 				}
@@ -324,18 +274,18 @@ namespace EBE
 				_state[cursor--] = c--;
 			}
 
-			_doneIterating = true;
+			DoneIterating = true;
 			return false;
 		}
 
 		/// <summary>
 		/// Resets the enumerator to initial conditions.
 		/// </summary>
-		public void Reset()
+		public override void Reset()
 		{
-			_doneIterating = _numVariables < 2;
+            base.Reset();
 
-			_iterationCount = 1;
+			DoneIterating = _numVariables < 2;
 
 			_state = new List<int>();
 
@@ -343,14 +293,6 @@ namespace EBE
 			{
 				_state.Add(1);
 			}
-		}
-
-		/// <summary>
-		/// Dispose.
-		/// </summary>
-		public void Dispose()
-		{
-			// nothing to do
 		}
 
 		/// <summary>
