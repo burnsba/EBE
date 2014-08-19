@@ -376,10 +376,14 @@ namespace EBE.Core.ExpressionIterators
         public override void Reset()
         {
             base.Reset();
+
             DoneIterating = _numVariables <= 2;
+
             _sets = new List<int>();
+
             _setLength = 1;
             _sets.Add(_numVariables);
+
             _subIps.Clear();
         }
 

@@ -8,13 +8,13 @@ namespace EBE.Parse
     {
         private const string versionString = "0.0.1";
 
-        public static void Main (string[] args)
+        public static void Main(string[] args)
         {
             bool show_help = false;
             bool showVersion = false;
             int maxBits = 1;
             string rawExpression = String.Empty;
-            var p = new OptionSet ()
+            var p = new OptionSet()
             {
                 { "b|bits=", "Max number of bits to use when evaluating expression (default=1)",
                     (int v) => maxBits = v
@@ -31,12 +31,12 @@ namespace EBE.Parse
 
             try
             {
-                var r = p.Parse (args);
+                var r = p.Parse(args);
                 r.ForEach(x => rawExpression += x);
             }
             catch
             {
-                Console.WriteLine ("Try `gen --help' for more information.");
+                Console.WriteLine("Try `gen --help' for more information.");
                 return;
             }
 
@@ -48,7 +48,7 @@ namespace EBE.Parse
 
             if (show_help)
             {
-                ShowHelp (p);
+                ShowHelp(p);
                 return;
             }
 
@@ -70,12 +70,12 @@ namespace EBE.Parse
             );
         }
 
-        static void ShowHelp (OptionSet p)
+        static void ShowHelp(OptionSet p)
         {
-            Console.WriteLine ("Usage: gen [OPTIONS]+");
-            Console.WriteLine ();
-            Console.WriteLine ("Options:");
-            p.WriteOptionDescriptions (Console.Out);
+            Console.WriteLine("Usage: gen [OPTIONS]+");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(Console.Out);
         }
 
         static void ShowVersion()

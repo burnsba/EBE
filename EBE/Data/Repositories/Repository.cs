@@ -5,6 +5,7 @@ namespace EBE.Data
 {
     public class Repository<T> : IRepository<T> where T : class
     {
+        /// <inheritdoc/>
         public void Add(T item)
         {
             using(var context = new EBEContext())
@@ -13,6 +14,7 @@ namespace EBE.Data
             }
         }
 
+        /// <inheritdoc/>
         public void Update(T item)
         {
             using(var context = new EBEContext())
@@ -21,6 +23,7 @@ namespace EBE.Data
             }
         }
 
+        /// <inheritdoc/>
         public void Remove(T item)
         {
             using(var context = new EBEContext())
@@ -29,6 +32,7 @@ namespace EBE.Data
             }
         }
 
+        /// <inheritdoc/>
         public T FindById(Guid id)
         {
             using(var context = new EBEContext())
@@ -37,6 +41,7 @@ namespace EBE.Data
             }
         }
 
+        /// <inheritdoc/>
         public bool Exists(Guid id)
         {
             using(var context = new EBEContext())
@@ -45,6 +50,7 @@ namespace EBE.Data
             }
         }
 
+        /// <inheritdoc/>
         public List<T> Find(string propertyName, object value)
         {
             using(var context = new EBEContext())
@@ -53,6 +59,7 @@ namespace EBE.Data
             }
         }
 
+        /// <inheritdoc/>
         public List<T> Find(string propertyName, object value, string propertyName2, object value2)
         {
             using(var context = new EBEContext())

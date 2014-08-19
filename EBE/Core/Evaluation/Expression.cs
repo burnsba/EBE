@@ -82,6 +82,7 @@ namespace EBE.Core.Evaluation
         {
             List<Token> tokens = new List<Token>();
             StringReader reader = new StringReader(expression);
+
             //Tokenize the expression
             Token t = null;
 
@@ -94,6 +95,7 @@ namespace EBE.Core.Evaluation
 
             //Use a minimal version of the Shunting Yard algorithm to transform the token list to polish notation
             List<Token> polishNotation = TransformToPolishNotation(tokens);
+
             var enumerator = polishNotation.GetEnumerator();
             enumerator.MoveNext();
             Root = Make(ref enumerator);

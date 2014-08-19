@@ -23,10 +23,10 @@ namespace EBE
         // Catch SIGINT
         private static UnixSignal[] signals = new UnixSignal []
         {
-            new UnixSignal (Mono.Unix.Native.Signum.SIGINT)
+            new UnixSignal(Mono.Unix.Native.Signum.SIGINT)
         };
 
-        public static void Main (string[] args)
+        public static void Main(string[] args)
         {
             Application.LoadLibraries();
             bool show_help = false;
@@ -35,7 +35,7 @@ namespace EBE
             bool showVersion = false;
             int numVariables = 2;
             int maxBits = 1;
-            var p = new OptionSet ()
+            var p = new OptionSet()
             {
                 { "c|continue", "Load latest context file and continue processing",
                     v => continue_processing = true
@@ -64,11 +64,11 @@ namespace EBE
 
             try
             {
-                p.Parse (args);
+                p.Parse(args);
             }
             catch
             {
-                Console.WriteLine ("Try `gen --help' for more information.");
+                Console.WriteLine("Try `gen --help' for more information.");
                 return;
             }
 
@@ -80,7 +80,7 @@ namespace EBE
 
             if (show_help || (numVariables < 1 && continue_processing == false))
             {
-                ShowHelp (p);
+                ShowHelp(p);
                 return;
             }
 
@@ -91,12 +91,12 @@ namespace EBE
             }
 
             Generator g = null;
-            Thread signal_thread = new Thread (delegate ()
+            Thread signal_thread = new Thread(delegate()
             {
                 while (true)
                 {
                     // Wait for a signal to be delivered
-                    UnixSignal.WaitAny (signals, -1);
+                    UnixSignal.WaitAny(signals, -1);
 
                     if (g != null)
                     {
@@ -139,7 +139,7 @@ namespace EBE
             }
 
             var a = Stopwatch.StartNew();
-            using (StreamWriter sw = new StreamWriter(Console.OpenStandardOutput()))
+            using(StreamWriter sw = new StreamWriter(Console.OpenStandardOutput()))
             {
                 if (loadFromFile)
                 {
@@ -185,12 +185,12 @@ namespace EBE
             Console.WriteLine("Skipped {0} existing records, added {1} new ones.", g.DbSkip, g.DbNew);
         }
 
-        static void ShowHelp (OptionSet p)
+        static void ShowHelp(OptionSet p)
         {
-            Console.WriteLine ("Usage: gen [OPTIONS]+");
-            Console.WriteLine ();
-            Console.WriteLine ("Options:");
-            p.WriteOptionDescriptions (Console.Out);
+            Console.WriteLine("Usage: gen [OPTIONS]+");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(Console.Out);
         }
 
         static void ShowVersion()

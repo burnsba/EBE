@@ -10,8 +10,10 @@ namespace EBE.Core.Utilities
         {
             // step 1, calculate MD5 hash from input
             MD5 md5 = System.Security.Cryptography.MD5.Create();
+
             byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
             byte[] hash = md5.ComputeHash(inputBytes);
+
             // step 2, convert byte array to hex string
             StringBuilder sb = new StringBuilder();
 
@@ -27,8 +29,10 @@ namespace EBE.Core.Utilities
         {
             // step 1, calculate MD5 hash from input
             MD5 md5 = System.Security.Cryptography.MD5.Create();
+
             byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
             byte[] hash = md5.ComputeHash(inputBytes);
+
             return hash;
         }
 
@@ -36,8 +40,10 @@ namespace EBE.Core.Utilities
         {
             // step 1, calculate MD5 hash from input
             MD5 md5 = System.Security.Cryptography.MD5.Create();
+
             byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
             byte[] hash = md5.ComputeHash(inputBytes);
+
             return new Guid(hash);
         }
     }

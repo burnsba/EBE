@@ -164,6 +164,7 @@ namespace EBE.Core
             int internalInputCount = int.Parse(ids[0]);
             int internalOutputCount = int.Parse(ids[1]);
             int id = int.Parse(ids[2]);
+
             List<int> internalOutputId = null;
 
             if (ids.Length > 3)

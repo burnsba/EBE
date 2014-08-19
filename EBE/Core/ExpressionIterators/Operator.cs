@@ -72,9 +72,12 @@ namespace EBE.Core.ExpressionIterators
 
             _internalInputCount = internalInputCount;
             _internalOutputCount = internalOutputCount;
+
             Id = id;
+
             _internalOutputEvalMap = new List<int[]>();
             _internalOutputId = new List<int>();
+
             int right = 1 << (1 + _internalOutputCount);
             int pow = 1 << (_internalInputCount + 2);
 
@@ -134,6 +137,7 @@ namespace EBE.Core.ExpressionIterators
 
             Reset(0, outputIds);
             _toStringIsDirty = true;
+
             // can't call base.Reset on abstract class
             DoneIterating = false;
             IterationCount = 1;
@@ -262,8 +266,10 @@ namespace EBE.Core.ExpressionIterators
                 {
                     _toStringIsDirty = true;
                     _toStringInternalOutputIdIsDirty = true;
+
                     IterationCount++;
                     Reset(Id + 1, _internalOutputId);
+
                     return true;
                 }
 
@@ -274,7 +280,9 @@ namespace EBE.Core.ExpressionIterators
                         _toStringIsDirty = true;
                         _toStringInternalOutputIdIsDirty = true;
                         _internalInputCount++;
+
                         IterationCount++;
+
                         List<int> outputIds = new List<int>();
 
                         for (int i = 0; i < _internalOutputCount; i++)
@@ -290,14 +298,18 @@ namespace EBE.Core.ExpressionIterators
                 if (_internalOutputCount + 1 <= MaxInternalOutput)
                 {
                     _internalOutputCount++;
+
                     IterationCount++;
+
                     List<int> outputIds = new List<int>();
 
                     for (int i = 0; i < _internalOutputCount; i++)
                     {
                         _toStringIsDirty = true;
                         _toStringInternalOutputIdIsDirty = true;
+
                         outputIds.Add(0);
+
                         _internalOutputId.Add(0);
                         _internalOutputEvalMap.Add(new int[1]);
                     }
@@ -382,8 +394,10 @@ namespace EBE.Core.ExpressionIterators
         private int BitEval(int a, int b)
         {
             int index = 0;
+
             index = (a & 0x01) << 1;
             index += (b & 0x01);
+
             return _outputEvalMap[index];
         }
 

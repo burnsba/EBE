@@ -40,6 +40,7 @@ namespace EBE.Core.Evaluation
         {
             _expression = new Expression(maxBits);
             _expression.Parse(expression);
+
             PostConstructor(_expression, numSlots, maxBits);
         }
 
@@ -52,6 +53,7 @@ namespace EBE.Core.Evaluation
         public Evaluator(Expression expression, int numSlots, int maxBits)
         {
             _expression = expression;
+
             PostConstructor(_expression, numSlots, maxBits);
         }
 
@@ -73,6 +75,7 @@ namespace EBE.Core.Evaluation
 
             _numVariables = _variables.Keys.Count;
             _numSlots = numSlots;
+
             // sets _maxVariableValue too
             MaxBits = maxBits;
         }

@@ -1,21 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Core/ExpressionIterators/VarState.cs">
-    <Files>
-      <File FileName="Test/CoreTest.cs" Line="302" Column="66" />
-      <File FileName="Core/Utilities/Math.cs" Line="14" Column="28" />
-      <File FileName="Gen/Generator.cs" Line="321" Column="94" />
-      <File FileName="Core/ExpressionIterators/VarState.cs" Line="106" Column="6" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True" selected="True">
+        <State expanded="True">
           <Node name="Core" expanded="True">
             <Node name="Evaluation" expanded="True" />
             <Node name="ExpressionIterators" expanded="True" />
             <Node name="Utilities" expanded="True" />
           </Node>
-          <Node name="Gen" expanded="True" />
+          <Node name="Gen" expanded="True">
+            <Node name="Generator.cs" selected="True" />
+          </Node>
           <Node name="Parse" expanded="True" />
           <Node name="Test" expanded="True" />
         </State>

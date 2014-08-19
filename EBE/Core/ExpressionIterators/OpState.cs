@@ -85,7 +85,9 @@ namespace EBE.Core.ExpressionIterators
         public OpState(int num)
         {
             OnCreated();
+
             _numVariables = num;
+
             Reset();
         }
 
@@ -169,10 +171,14 @@ namespace EBE.Core.ExpressionIterators
         public override string ToString()
         {
             string s = String.Empty;
+
             s += "{";
+
             List<string> opIds = _state.Select(x => x.ToString()).ToList();
             s += String.Join(", ", opIds);
+
             s += "}";
+
             return s;
         }
 
