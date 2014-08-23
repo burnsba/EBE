@@ -175,13 +175,20 @@ namespace EBE.Core.ExpressionIterators
 
             int internalInputCount = int.Parse(ids[0]);
             int internalOutputCount = int.Parse(ids[1]);
-            int id = int.Parse(ids[2]);
+            int id = 0;
 
             List<int> internalOutputId = null;
 
-            if (ids.Length > 3)
+            if(ids[2].Contains("-"))
             {
-                internalOutputId = ids[3].Split('-').ToList().Select(x => int.Parse(x)).ToList();
+                string[] oids = ids[2].Split('-');
+                id = int.Parse(oids.First());
+
+                internalOutputId = oids.ToList().Skip(1).Select(x => int.Parse(x)).ToList();
+            }
+            else
+            {
+                id = int.Parse(ids[2]);
             }
 
             Operator op = new Operator(internalInputCount, internalOutputCount, id, internalOutputId, maxBits);

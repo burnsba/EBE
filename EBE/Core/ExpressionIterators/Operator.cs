@@ -16,7 +16,7 @@ namespace EBE.Core.ExpressionIterators
         // compiler time constants. Gives an upper limit on the number
         // of possible iterations.
         public const int MaxInternalInput = 1;
-        public const int MaxInternalOutput = 0;
+        public const int MaxInternalOutput = 1;
 
         private int _internalInputCount;
 

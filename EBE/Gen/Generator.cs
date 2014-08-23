@@ -62,7 +62,7 @@ namespace EBE
 
         private TimeSpan _saveFrequency = new TimeSpan(0, 10, 0);
 
-        DateTime _lastSaveTime;
+        private DateTime _lastSaveTime;
 
         private bool _receivedInterrupt = false;
 

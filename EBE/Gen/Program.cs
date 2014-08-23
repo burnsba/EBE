@@ -33,7 +33,7 @@ namespace EBE
         {
             Application.LoadLibraries();
             bool show_help = false;
-            bool continue_processing = true;
+            bool continue_processing = false;
             bool pauseAfterEach = false;
             bool showVersion = false;
             int numVariables = 2;
