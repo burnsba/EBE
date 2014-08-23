@@ -13,6 +13,7 @@ using EBE.Core;
 using EBE.Core.ExpressionIterators;
 using EBE.Core.Utilities;
 using EBE.Core.Evaluation;
+using System.Xml.Linq;
 
 namespace EBE
 {
@@ -41,34 +42,27 @@ namespace EBE
     /// 4 - 165000 - 0 min 14 sec
     /// 5 - 23400000 - 11 min 48 sec
     /// </remarks>
-    [DataContract]
     public class Generator
     {
         #region Fields
 
-        [DataMember(Name = "NumVariables", Order = 1)]
         private int _numVariables = 1;
 
-        [DataMember(Name = "GParenState", Order = 3)]
         private ParenState _paren = null;
 
-        [DataMember(Name = "GVarState", Order = 4)]
         private VarState _var = null;
 
-        [DataMember(Name = "GOpState", Order = 5)]
         private OpState _op = null;
 
-        [DataMember(Name = "IterationCount", Order = 2)]
         private int _iterationCount = 0;
 
-        [DataMember(Name = "PauseAfterEach", Order = 6)]
         private bool _pauseAfterEach = false;
 
-        [DataMember(Name = "MaxBits", Order = 7)]
         private int _maxBits = 1;
 
-        private TimeSpan _saveFrequency;
-        private DateTime _lastSaveTime;
+        private TimeSpan _saveFrequency = new TimeSpan(0, 10, 0);
+
+        DateTime _lastSaveTime;
 
         private bool _receivedInterrupt = false;
 
@@ -188,6 +182,11 @@ namespace EBE
 
         #region Constructors
 
+        private Generator()
+        {
+            _context = new EBEContext();
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EBE.Generator"/> class.
         /// </summary>
@@ -195,9 +194,9 @@ namespace EBE
         /// <param name="outputStream">Where to send output.</param>
         public Generator(int num, StreamWriter outputStream)
         {
-            OnCreated();
             _numVariables = num;
             _outputStream = outputStream;
+            _context = new EBEContext();
         }
 
         #endregion
@@ -228,7 +227,7 @@ namespace EBE
                 {
                     if (_pastFirstResume || _op == null)
                     {
-                        _op = new OpState(_numVariables);
+                        _op = new OpState(_numVariables, _maxBits);
                     }
 
                     do
@@ -240,7 +239,7 @@ namespace EBE
 
                         foreach (var s in varNames)
                         {
-                            output = Extensions.ReplaceFirst(output, Placeholder.Var, s);
+                            output = EBE.Core.Utilities.Extensions.ReplaceFirst(output, Placeholder.Var, s);
                         }
 
                         opValues = _op.OpValues;
@@ -275,31 +274,27 @@ namespace EBE
                         }
                         while (evaluator.MoveNext() && doWork);
 
-                        /*
-                        if (_paren.IterationCount == 7 && _var.IterationCount == 2 && _op.IterationCount == 916)
-                        {
-                            var a = 1;
-                        }
-                        */
                         line = String.Format("{0}.{1}.{2}.{3} {4}",
                                              _numVariables,
                                              _paren.IterationCount,
                                              _var.IterationCount,
                                              _op.IterationCount,
                                              output);
+
                         _outputStream.WriteLine(line);
-                        //_outputStream.WriteLine(
-                        //    "Eval: " +
-                        //    String.Join(",", evalOutput)
-                        //    );
+
                         _outputStream.Flush();
+
                         Gen g = new Gen();
+
                         g.Id = Guid.NewGuid();
                         g.ParenId = _paren.IterationCount;
                         g.VariableId = _var.IterationCount;
                         g.OperatorId = _op.IterationCount;
                         g.Expression = output;
+
                         Encyclopedia e = new Encyclopedia();
+
                         e.CleanedInput = output;
                         e.EvalId = Crypto.CalculateMD5HashGuid(String.Join(",", evalOutput));
                         e.Gen = g;
@@ -360,32 +355,55 @@ namespace EBE
             DateTime now = DateTime.Now;
             _saveFilePath = String.Format("t{0}.context",
                                           now.ToString("yyyyMMddHHmmss"));
-            DataContractSerializer x =
-                new DataContractSerializer(this.GetType(), null,
-                                           0x7FFF /*maxItemsInObjectGraph*/,
-                                           false /*ignoreExtensionDataObject*/,
-                                           true /*preserveObjectReferences : this is where the magic happens */,
-                                           null /*dataContractSurrogate*/);
-            using(XmlWriter xw = XmlWriter.Create(_saveFilePath))
-            {
-                x.WriteObject(xw, this);
-            }
+
+            var xe = ToXElement();
+            var reader = xe.CreateReader();
+            reader.MoveToContent();
+
+            File.WriteAllText(_saveFilePath, reader.ReadOuterXml());
         }
 
-        [OnDeserializing]
-        private void OnDeserializing(StreamingContext c)
+        public XElement ToXElement()
         {
-            OnCreated();
+            XElement root = new XElement("Generator");
+
+            root.Add(new XElement("NumVariables", _numVariables));
+            root.Add(_paren.ToXElement());
+            root.Add(_var.ToXElement());
+            root.Add(_op.ToXElement());
+            root.Add(new XElement("IterationCount", _iterationCount));
+            root.Add(new XElement("PauseAfterEach", _pauseAfterEach));
+            root.Add(new XElement("MaxBits", _maxBits));
+
+            return root;
         }
 
-        private void OnCreated()
+        public static Generator FromXElement(XElement xe)
         {
-            _lastSaveTime = DateTime.MinValue;
-            // save context once per minute
-            _saveFrequency = new TimeSpan(0, 10, 0);
-            _context = new EBEContext();
-            DbNew = 0;
-            DbSkip = 0;
+            Generator g = new Generator();
+
+            XElement xel = xe.Elements("NumVariables").FirstOrDefault();
+            g._numVariables = int.Parse(xel.Value);
+
+            xel = xe.Elements("IterationCount").FirstOrDefault();
+            g._iterationCount = int.Parse(xel.Value);
+
+            xel = xe.Elements("PauseAfterEach").FirstOrDefault();
+            g._pauseAfterEach = bool.Parse(xel.Value);
+
+            xel = xe.Elements("MaxBits").FirstOrDefault();
+            g._maxBits = int.Parse(xel.Value);
+
+            xel = xe.Elements("ParenState").FirstOrDefault();
+            g._paren = ParenState.FromXElement(xel);
+
+            xel = xe.Elements("VarState").FirstOrDefault();
+            g._var = VarState.FromXElement(xel);
+
+            xel = xe.Elements("OpState").FirstOrDefault();
+            g._op = OpState.FromXElement(xel);
+
+            return g;
         }
 
         #endregion

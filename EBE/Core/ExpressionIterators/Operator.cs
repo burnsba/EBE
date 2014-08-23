@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Collections;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace EBE.Core.ExpressionIterators
 {
     /// <summary>
     /// Operator for bit expressions.
     /// </summary>
-    [DataContract]
     public class Operator : OperatorBase
     {
         // compiler time constants. Gives an upper limit on the number
@@ -18,28 +18,20 @@ namespace EBE.Core.ExpressionIterators
         public const int MaxInternalInput = 1;
         public const int MaxInternalOutput = 0;
 
-        [DataMember(Name = "InternalInputCount", Order = 2)]
         private int _internalInputCount;
 
-        [DataMember(Name = "InternalOutputCount", Order = 3)]
         private int _internalOutputCount;
 
-        [DataMember(Name = "NumberCombinations", Order = 4)]
         private int _numberCombinations;
 
-        [DataMember(Name = "DegreesOfFreedom", Order = 5)]
         private int _degreesOfFreedom;
 
-        [DataMember(Name = "InternalOutputEvalMap", Order = 6)]
         private List<int[]> _internalOutputEvalMap;
 
-        [DataMember(Name = "InternalOutputId", Order = 7)]
         private List<int> _internalOutputId;
 
-        [DataMember(Name = "OutputEvalMap", Order = 8)]
         private int[] _outputEvalMap;
 
-        [DataMember(Name = "OutputEvalMap", Order = 9)]
         private int _traditionalOperatorIndex = 1;
 
         private TraditionalOperator _toperator;
@@ -50,6 +42,38 @@ namespace EBE.Core.ExpressionIterators
         bool _toStringInternalOutputIdIsDirty = true;
         string _toStringInternalOutputIdValue = String.Empty;
 
+        protected Operator(XElement xe)
+            : base(xe.Elements((XName)"OperatorBase").FirstOrDefault())
+        {
+            XElement xel = xe.Elements("InternalInputCount").FirstOrDefault();
+            _internalInputCount = int.Parse(xel.Value);
+
+            xel = xe.Elements("InternalOutputCount").FirstOrDefault();
+            _internalOutputCount = int.Parse(xel.Value);
+
+            xel = xe.Elements("NumberCombinations").FirstOrDefault();
+            _numberCombinations = int.Parse(xel.Value);
+
+            xel = xe.Elements("DegreesOfFreedom").FirstOrDefault();
+            _degreesOfFreedom = int.Parse(xel.Value);
+
+            xel = xe.Elements("TraditionalOperatorIndex").FirstOrDefault();
+            _traditionalOperatorIndex = int.Parse(xel.Value);
+
+            _internalOutputId = new List<int>();
+
+            xel = xe.Elements("InternalOutputId").FirstOrDefault();
+            foreach(var x in xel.Descendants())
+            {
+                _internalOutputId.Add(int.Parse(x.Value));
+            }
+        }
+
+        public static Operator FromXElement(XElement xe)
+        {
+            return new Operator(xe);
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EBE.Core.ExpressionIterators.Operator"/> class.
         /// </summary>
@@ -57,8 +81,9 @@ namespace EBE.Core.ExpressionIterators
         /// <param name="internalOutputCount">Internal output count.</param>
         /// <param name="id">Id.</param>
         /// <param name="internalOutputId">Internal output identifier.</param>
-        public Operator(int internalInputCount, int internalOutputCount, int id, List<int> internalOutputId)
-        : base(OperatorType.Bit)
+        /// <param name="maxBits">Max number of bits in operator</param>
+        public Operator(int internalInputCount, int internalOutputCount, int id, List<int> internalOutputId, int maxBits)
+        : base(OperatorType.Bit, maxBits)
         {
             if (internalOutputId == null && _internalOutputCount != 0)
             {
@@ -119,7 +144,7 @@ namespace EBE.Core.ExpressionIterators
             {
                 if (_toperator == null)
                 {
-                    _toperator = new TraditionalOperator();
+                    _toperator = new TraditionalOperator(MaxBits);
                 }
 
                 return _toperator;
@@ -179,19 +204,19 @@ namespace EBE.Core.ExpressionIterators
         /// <summary>
         /// Gets first instance of bit operator.
         /// </summary>
-        public static Operator First()
+        public static Operator First(int maxBits)
         {
-            return new Operator(0, 0, 0, null);
+            return new Operator(0, 0, 0, null, maxBits);
         }
 
         public Operator FamilyFirst()
         {
-            return new Operator(_internalInputCount, _internalOutputCount, 0, _internalOutputId);
+            return new Operator(_internalInputCount, _internalOutputCount, 0, _internalOutputId, MaxBits);
         }
 
         public Operator FamilyLast()
         {
-            return new Operator(_internalInputCount, _internalOutputCount, Id - 1, _internalOutputId);
+            return new Operator(_internalInputCount, _internalOutputCount, Id - 1, _internalOutputId, MaxBits);
         }
 
         public int InternalInputCount
@@ -441,6 +466,30 @@ namespace EBE.Core.ExpressionIterators
             }
 
             return solution & MaxBitValue;
+        }
+
+        public new XElement ToXElement()
+        {
+            XElement root = new XElement("Operator");
+
+            root.Add(new XElement("InternalInputCount", _internalInputCount));
+            root.Add(new XElement("InternalOutputCount", _internalOutputCount));
+            root.Add(new XElement("NumberCombinations", _numberCombinations));
+            root.Add(new XElement("DegreesOfFreedom", _degreesOfFreedom));
+            root.Add(new XElement("TraditionalOperatorIndex", _traditionalOperatorIndex));
+
+            XElement internalOutputId = new XElement("InternalOutputId");
+
+            foreach(var i in _internalOutputId)
+            {
+                internalOutputId.Add(new XElement("int", i));
+            }
+
+            root.Add(internalOutputId);
+
+            root.Add(base.ToXElement());
+
+            return root;
         }
     }
 }

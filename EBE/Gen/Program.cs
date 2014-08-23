@@ -13,6 +13,9 @@ using Mono.Options;
 using EBE.Data;
 using System.Reflection;
 using EBE.Core.Utilities;
+using EBE.Core.ExpressionIterators;
+using EBE.Core;
+using System.Xml.Linq;
 
 namespace EBE
 {
@@ -30,7 +33,7 @@ namespace EBE
         {
             Application.LoadLibraries();
             bool show_help = false;
-            bool continue_processing = false;
+            bool continue_processing = true;
             bool pauseAfterEach = false;
             bool showVersion = false;
             int numVariables = 2;
@@ -145,17 +148,12 @@ namespace EBE
                 {
                     try
                     {
-                        DataContractSerializer dcs = new DataContractSerializer(typeof(Generator));
-                        FileStream fs = new FileStream(fileName, FileMode.Open);
-                        using(XmlDictionaryReader reader =
-                                  XmlDictionaryReader.CreateTextReader(fs, new XmlDictionaryReaderQuotas()))
-                        {
-                            g = (Generator)dcs.ReadObject(reader);
-                        }
+                        g = Generator.FromXElement(XElement.Load(fileName));
+
                         g.ResumeFromSave = true;
                         g.OutputStream = sw;
                     }
-                    catch
+                    catch (Exception)
                     {
                         g = new Generator(numVariables, sw);
                         g.MaxBits = maxBits;

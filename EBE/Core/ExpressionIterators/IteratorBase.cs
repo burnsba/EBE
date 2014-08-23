@@ -1,20 +1,32 @@
 using System;
 using System.Collections;
 using System.Runtime.Serialization;
+using System.Xml.Linq;
+using System.Linq;
 
 namespace EBE.Core
 {
-    [DataContract]
     public abstract class IteratorBase : IEnumerator
     {
-        [DataMember(Name = "Id", Order = 1)]
         private int _id;
 
-        [DataMember(Name = "IterationCount", Order = 2)]
         private int _iterationCount = 1;
 
-        [DataMember(Name = "DoneIterating", Order = 10)]
         private bool _doneIterating = false;
+
+        protected IteratorBase(XElement xe)
+        {
+            XElement ib = xe.Elements("IteratorBase").FirstOrDefault();
+
+            XElement xel = ib.Elements("Id").FirstOrDefault();
+            _id = int.Parse(xel.Value);
+
+            xel = ib.Elements("IterationCount").FirstOrDefault();
+            _iterationCount = int.Parse(xel.Value);
+
+            xel = ib.Elements("DoneIterating").FirstOrDefault();
+            _doneIterating = bool.Parse(xel.Value);
+        }
 
         public IteratorBase()
         {
@@ -122,18 +134,15 @@ namespace EBE.Core
             // nothing to do
         }
 
-        [OnDeserializing]
-        private void OnDeserializing(StreamingContext c)
+        public XElement ToXElement()
         {
-            OnCreated();
-        }
+            XElement root = new XElement("IteratorBase");
 
-        /// <summary>
-        /// Called by OnDeserializing.
-        /// </summary>
-        protected virtual void OnCreated()
-        {
-            // nothing to do
+            root.Add(new XElement("Id", _id));
+            root.Add(new XElement("IterationCount", _iterationCount));
+            root.Add(new XElement("DoneIterating", _doneIterating));
+
+            return root;
         }
     }
 }

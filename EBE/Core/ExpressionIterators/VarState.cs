@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Linq;
 
 namespace EBE.Core.ExpressionIterators
 {
@@ -16,7 +17,6 @@ namespace EBE.Core.ExpressionIterators
     /// <summary>
     /// Variable state.
     /// </summary>
-    [DataContract]
     public class VarState : IteratorBase
     {
         #region Fields
@@ -24,13 +24,11 @@ namespace EBE.Core.ExpressionIterators
         /// <summary>
         /// Number of variables to build expressions for.
         /// </summary>
-        [DataMember(Name = "NumVariables", Order = 1)]
         private readonly int _numVariables;
 
         /// <summary>
         /// Variable state.
         /// </summary>
-        [DataMember(Name = "State", Order = 4)]
         private List<int> _state = null;
 
         /// <summary>
@@ -181,6 +179,21 @@ namespace EBE.Core.ExpressionIterators
 
         #region Constructors
 
+        protected VarState(XElement xe)
+            : base(xe)
+        {
+            XElement xel = xe.Elements("NumVariables").FirstOrDefault();
+            _numVariables = int.Parse(xel.Value);
+
+            _state = new List<int>();
+
+            xel = xe.Elements("State").FirstOrDefault();
+            foreach(var x in xel.Descendants())
+            {
+                _state.Add(int.Parse(x.Value));
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of <see cref="VarState"/>.
         /// </summary>
@@ -189,6 +202,11 @@ namespace EBE.Core.ExpressionIterators
         {
             _numVariables = num;
             Reset();
+        }
+
+        public static VarState FromXElement(XElement xe)
+        {
+            return new VarState(xe);
         }
 
         #endregion
@@ -329,6 +347,26 @@ namespace EBE.Core.ExpressionIterators
 
             max++;
             return max;
+        }
+
+        public new XElement ToXElement()
+        {
+            XElement root = new XElement("VarState");
+
+            root.Add(new XElement("NumVariables", _numVariables));
+
+            XElement state = new XElement("State");
+
+            foreach(var i in _state)
+            {
+                state.Add(new XElement("int", i));
+            }
+
+            root.Add(state);
+
+            root.Add(base.ToXElement());
+
+            return root;
         }
 
         #endregion

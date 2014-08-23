@@ -10,7 +10,6 @@ namespace EBE.Core.ExpressionIterators
     /// <summary>
     /// Used to evaluate "regular" operators like +,-,*, etc.
     /// </summary>
-    [DataContract]
     public class TraditionalOperator : OperatorBase
     {
         /// <summary>
@@ -38,7 +37,7 @@ namespace EBE.Core.ExpressionIterators
         /// <summary>
         /// Initializes a new instance of the <see cref="EBE.Core.ExpressionIterators.Operator"/> class.
         /// </summary>
-        public TraditionalOperator() : base(OperatorType.Traditional)
+        public TraditionalOperator(int maxBits) : base(OperatorType.Traditional, maxBits)
         {
         }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using EBE.Core;
+using System.Xml.Linq;
 
 namespace EBE.Core.ExpressionIterators
 {
@@ -24,7 +25,6 @@ namespace EBE.Core.ExpressionIterators
     /// <remarks>
     /// https://oeis.org/A001003
     /// </remarks>
-    [DataContract]
     public class ParenState : IteratorBase
     {
         #region Fields
@@ -42,31 +42,26 @@ namespace EBE.Core.ExpressionIterators
         /// <summary>
         /// Number of variables to build expressions for.
         /// </summary>
-        [DataMember(Name = "NumVariables", Order = 1)]
-        private readonly int _numVariables;
+        private int _numVariables;
 
         /// <summary>
         /// Current number of sets.
         /// </summary>
-        [DataMember(Name = "SetLength", Order = 3)]
         private int _setLength;
 
         /// <summary>
         /// Describes current sub partitions.
         /// </summary>
-        [DataMember(Name = "Sets", Order = 5)]
         private List<int> _sets = null;
 
         /// <summary>
         /// Parentheses state for the object.
         /// </summary>
-        [DataMember(Name = "State", Order = 6)]
         private List<int> _state = null;
 
         /// <summary>
         /// Children for recursion.
         /// </summary>
-        [DataMember(Name = "SubIps", Order = 7)]
         private List<ParenState> _subIps = null;
 
         #endregion
@@ -203,6 +198,40 @@ namespace EBE.Core.ExpressionIterators
         #endregion
 
         #region Constructors
+
+        protected ParenState(XElement xe)
+            : base(xe)
+        {
+            XElement xel = xe.Elements("NumVariables").FirstOrDefault();
+            _numVariables = int.Parse(xel.Value);
+
+            xel = xe.Elements("SetLength").FirstOrDefault();
+            _setLength = int.Parse(xel.Value);
+
+            _state = new List<int>();
+            _sets = new List<int>();
+            _subIps = new List<ParenState>();
+
+            DoneIterating = _numVariables <= 2;
+
+            xel = xe.Elements("Sets").FirstOrDefault();
+            foreach(var x in xel.Descendants())
+            {
+                _sets.Add(int.Parse(x.Value));
+            }
+
+            xel = xe.Elements("State").FirstOrDefault();
+            foreach(var x in xel.Descendants())
+            {
+                _state.Add(int.Parse(x.Value));
+            }
+
+            xel = xe.Elements("SubIps").FirstOrDefault();
+            foreach(var x in xel.Descendants())
+            {
+                _subIps.Add(ParenState.FromXElement(x));
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of <see cref="ParenState"/>.
@@ -449,6 +478,50 @@ namespace EBE.Core.ExpressionIterators
             }
 
             return s;
+        }
+
+        public new XElement ToXElement()
+        {
+            XElement root = new XElement("ParenState");
+
+            root.Add(new XElement("NumVariables", _numVariables));
+            root.Add(new XElement("SetLength", _setLength));
+
+            XElement sets = new XElement("Sets");
+
+            foreach(var i in _sets)
+            {
+                sets.Add(new XElement("int", i));
+            }
+
+            root.Add(sets);
+
+            XElement state = new XElement("State");
+
+            foreach(var i in _state)
+            {
+                state.Add(new XElement("int", i));
+            }
+
+            root.Add(state);
+
+            XElement subIps = new XElement("SubIps");
+
+            foreach(var p in _subIps)
+            {
+                subIps.Add(p.ToXElement());
+            }
+
+            root.Add(subIps);
+
+            root.Add(base.ToXElement());
+
+            return root;
+        }
+
+        public static ParenState FromXElement(XElement xe)
+        {
+            return new ParenState(xe);
         }
 
         #endregion

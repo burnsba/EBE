@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using EBE.Core;
+using System.Xml.Linq;
 
 namespace EBE.Core.ExpressionIterators
 {
     /// <summary>
     /// Operator state.
     /// </summary>
-    [DataContract]
     public class OpState : IteratorBase
     {
         #region Fields
@@ -20,14 +20,14 @@ namespace EBE.Core.ExpressionIterators
         /// <summary>
         /// Number of variables to build expressions for.
         /// </summary>
-        [DataMember(Name = "NumVariables", Order = 1)]
         private readonly int _numVariables;
 
         /// <summary>
         /// Variable state.
         /// </summary>
-        [DataMember(Name = "State", Order = 4)]
         private List<Operator> _state = null;
+
+        private int _maxBits;
 
         #endregion
 
@@ -78,17 +78,40 @@ namespace EBE.Core.ExpressionIterators
 
         #region Constructors
 
+        protected OpState(XElement xe)
+            : base(xe)
+        {
+            XElement xel = xe.Elements("NumVariables").FirstOrDefault();
+            _numVariables = int.Parse(xel.Value);
+
+            xel = xe.Elements("MaxBits").FirstOrDefault();
+            _maxBits = int.Parse(xel.Value);
+
+            _state = new List<Operator>();
+
+            xel = xe.Elements("State").FirstOrDefault();
+            foreach(var x in xel.Elements())
+            {
+                _state.Add(Operator.FromXElement(x));
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of <see cref="OpState"/>.
         /// </summary>
         /// <param name="num">Number of variables.</param>
-        public OpState(int num)
+        public OpState(int num, int maxBits)
         {
-            OnCreated();
+            _maxBits = maxBits;
 
             _numVariables = num;
 
             Reset();
+        }
+
+        public static OpState FromXElement(XElement xe)
+        {
+            return new OpState(xe);
         }
 
         #endregion
@@ -130,7 +153,7 @@ namespace EBE.Core.ExpressionIterators
 
                 while (cursor <= _numVariables - 2)
                 {
-                    _state[cursor] = Operator.First();
+                    _state[cursor] = Operator.First(_maxBits);
                     cursor++;
                 }
 
@@ -160,7 +183,7 @@ namespace EBE.Core.ExpressionIterators
 
             for (int i = 0; i < _numVariables - 1; i++)
             {
-                _state.Add(Operator.First());
+                _state.Add(Operator.First(_maxBits));
             }
         }
 
@@ -180,6 +203,27 @@ namespace EBE.Core.ExpressionIterators
             s += "}";
 
             return s;
+        }
+
+        public new XElement ToXElement()
+        {
+            XElement root = new XElement("OpState");
+
+            root.Add(new XElement("NumVariables", _numVariables));
+            root.Add(new XElement("MaxBits", _maxBits));
+
+            XElement state = new XElement("State");
+
+            foreach(var op in _state)
+            {
+                state.Add(op.ToXElement());
+            }
+
+            root.Add(state);
+
+            root.Add(base.ToXElement());
+
+            return root;
         }
 
         #endregion
